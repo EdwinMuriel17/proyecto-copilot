@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog: Estructura de Datos - Grafos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        nav {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        nav button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        nav button:hover {
+            background: #764ba2;
+        }
+
+        nav button.active {
+            background: #764ba2;
+        }
+
+        .post {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .post.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .post h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .post h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .post p {
+            margin-bottom: 15px;
+            text-align: justify;
+            font-size: 1.05em;
+        }
+
+        .post ul, .post ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        .post li {
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .diagram {
+            background: #f9f9f9;
+            border: 2px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f9f9f9;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background: #f0f0f0;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .note {
+            background: #d1ecf1;
+            padding: 15px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #0c5460;
+        }
+
+        footer {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: #666;
+            margin-top: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .post-meta {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        strong {
+            color: #667eea;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .comparison-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav button {
+                width: 100%;
+            }
+
+            .post {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📚 Blog: Estructura de Datos - Grafos</h1>
+            <p>Aprende todo sobre grafos, sus representaciones y algoritmos fundamentales</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav>
+            <button class="nav-btn active" onclick="mostrarPost(1)">Post #1: Introducción a Grafos</button>
+            <button class="nav-btn" onclick="mostrarPost(2)">Post #2: Representación de Grafos</button>
+            <button class="nav-btn" onclick="mostrarPost(3)">Post #3: Algoritmos de Recorrido</button>
+        </nav>
+
+        <!-- POST 1: Introducción a Grafos -->
+        <article class="post active" id="post1">
+            <h2>📌 Post #1: Introducción a los Grafos - Nodos, Aristas y Tipos</h2>
+            <div class="post-meta">
+                Publicado: 21 de Noviembre, 2025 | Lectura: 8 min
+            </div>
+
+            <h3>¿Qué es un Grafo?</h3>
+            <p>
+                Un <strong>grafo</strong> es una estructura de datos no lineal que consiste en un conjunto de 
+                <strong>vértices</strong> (también llamados <strong>nodos</strong>) conectados entre sí por 
+                <strong>aristas</strong> (también llamadas <strong>ejes</strong> o <strong>arcos</strong>). 
+                Los grafos se utilizan para representar relaciones entre objetos en el mundo real.
+            </p>
+
+            <div class="highlight">
+                <strong>Definición Formal:</strong> Un grafo G se define como G = (V, E), donde:
+                <ul>
+                    <li><strong>V</strong> es un conjunto finito de vértices</li>
+                    <li><strong>E</strong> es un conjunto finito de aristas (pares de vértices)</li>
+                </ul>
+            </div>
+
+            <h3>Conceptos Clave</h3>
+            <p><strong>1. Vértices o Nodos:</strong> Son los puntos o entidades principales del grafo. Cada vértice puede 
+            representar un objeto, una persona, una ciudad, etc.</p>
+
+            <p><strong>2. Aristas o Ejes:</strong> Son las conexiones entre dos vértices. Una arista conecta dos vértices 
+            y puede tener una dirección o una ponderación (peso).</p>
+
+            <p><strong>3. Grado de un Vértice:</strong> Es el número de aristas conectadas a un vértice.</p>
+
+            <p><strong>4. Camino:</strong> Es una secuencia de vértices donde cada vértice consecutivo está conectado por una arista.</p>
+
+            <p><strong>5. Ciclo:</strong> Es un camino que comienza y termina en el mismo vértice.</p>
+
+            <h3>Tipos de Grafos</h3>
+
+            <h4>1. Grafos No Dirigidos</h4>
+            <p>
+                Las aristas <strong>no tienen dirección</strong>. La relación entre dos vértices es bidireccional. 
+                Si hay una arista de A a B, también hay una arista de B a A.
+            </p>
+            <div class="code-block">
+Ejemplo: Red de amigos en redes sociales
+Si Juan es amigo de María, entonces María es amiga de Juan
+            </div>
+
+            <h4>2. Grafos Dirigidos (Digrafos)</h4>
+            <p>
+                Las aristas <strong>tienen dirección</strong>, indicada por flechas. Una arista va de un vértice 
+                de origen a un vértice destino. La relación es unidireccional.
+            </p>
+            <div class="code-block">
+Ejemplo: Red de seguimiento en Twitter
+Si A sigue a B, no significa que B siga a A
+            </div>
+
+            <h4>3. Grafos Ponderados</h4>
+            <p>
+                Cada arista tiene un <strong>peso</strong> o <strong>costo</strong> asociado. El peso puede representar 
+                distancia, tiempo, costo, etc.
+            </p>
+            <div class="code-block">
+Ejemplo: Mapa de ciudades
+Las aristas representan carreteras, y el peso es la distancia en km
+            </div>
+
+            <h3>Ejemplo Visual: Grafo No Dirigido</h3>
+            <div class="diagram">
+                <p><strong>Grafo No Dirigido con 5 Nodos</strong></p>
+                <svg viewBox="0 0 600 400" width="600" height="400">
+                    <!-- Aristas -->
+                    <line x1="150" y1="100" x2="300" y2="100" stroke="#667eea" stroke-width="2"/>
+                    <line x1="300" y1="100" x2="450" y1="100" stroke="#667eea" stroke-width="2"/>
+                    <line x1="150" y1="100" x2="150" y2="300" stroke="#667eea" stroke-width="2"/>
+                    <line x1="300" y1="100" x2="300" y2="300" stroke="#667eea" stroke-width="2"/>
+                    <line x1="450" y1="100" x2="450" y2="300" stroke="#667eea" stroke-width="2"/>
+                    <line x1="150" y1="300" x2="300" y2="300" stroke="#667eea" stroke-width="2"/>
+                    <line x1="300" y1="300" x2="450" y2="300" stroke="#667eea" stroke-width="2"/>
+                    <line x1="150" y1="100" x2="450" y2="300" stroke="#667eea" stroke-width="2" stroke-dasharray="5,5"/>
+
+                    <!-- Vértices -->
+                    <circle cx="150" cy="100" r="25" fill="#667eea"/>
+                    <circle cx="300" cy="100" r="25" fill="#667eea"/>
+                    <circle cx="450" cy="100" r="25" fill="#667eea"/>
+                    <circle cx="150" cy="300" r="25" fill="#764ba2"/>
+                    <circle cx="300" cy="300" r="25" fill="#764ba2"/>
+                    <circle cx="450" cy="300" r="25" fill="#764ba2"/>
+
+                    <!-- Etiquetas -->
+                    <text x="150" y="105" text-anchor="middle" fill="white" font-weight="bold">A</text>
+                    <text x="300" y="105" text-anchor="middle" fill="white" font-weight="bold">B</text>
+                    <text x="450" y="105" text-anchor="middle" fill="white" font-weight="bold">C</text>
+                    <text x="150" y="305" text-anchor="middle" fill="white" font-weight="bold">D</text>
+                    <text x="300" y="305" text-anchor="middle" fill="white" font-weight="bold">E</text>
+                    <text x="450" y="305" text-anchor="middle" fill="white" font-weight="bold">F</text>
+                </svg>
+            </div>
+
+            <div class="note">
+                <strong>📝 Nota:</strong> En este grafo no dirigido, observa que:
+                <ul>
+                    <li>Hay 6 vértices: A, B, C, D, E, F</li>
+                    <li>Hay 8 aristas conectando los vértices</li>
+                    <li>Las aristas no tienen dirección (son bidireccionales)</li>
+                    <li>Es un grafo conexo (todos los vértices están conectados)</li>
+                </ul>
+            </div>
+
+            <h3>Aplicaciones de Grafos en el Mundo Real</h3>
+            <ul>
+                <li><strong>Redes Sociales:</strong> Representar usuarios y sus conexiones</li>
+                <li><strong>Sistemas de Navegación GPS:</strong> Representar ciudades y carreteras</li>
+                <li><strong>Redes de Computadoras:</strong> Representar computadoras y conexiones de red</li>
+                <li><strong>Biología Molecular:</strong> Representar proteínas e interacciones</li>
+                <li><strong>Recomendaciones:</strong> Conectar productos similares o usuarios</li>
+                <li><strong>Transporte Público:</strong> Rutas de autobús, metro, etc.</li>
+            </ul>
+        </article>
+
+        <!-- POST 2: Representación de Grafos -->
+        <article class="post" id="post2">
+            <h2>📌 Post #2: Representación de Grafos</h2>
+            <div class="post-meta">
+                Publicado: 21 de Noviembre, 2025 | Lectura: 10 min
+            </div>
+
+            <h3>Introducción</h3>
+            <p>
+                Existen múltiples formas de representar un grafo en la memoria de una computadora. Las dos más 
+                importantes son la <strong>Lista de Adyacencia</strong> y la <strong>Matriz de Adyacencia</strong>. 
+                Cada una tiene ventajas y desventajas según el tipo de grafo y las operaciones que necesites realizar.
+            </p>
+
+            <h3>1. Lista de Adyacencia</h3>
+            <p>
+                La lista de adyacencia es una representación que utiliza listas para almacenar los vértices adyacentes 
+                a cada vértice. Para cada vértice, mantenemos una lista de los vértices con los que está conectado.
+            </p>
+
+            <h4>Ventajas:</h4>
+            <ul>
+                <li><strong>Eficiencia de Espacio:</strong> O(V + E), donde V es el número de vértices y E el número de aristas</li>
+                <li><strong>Ideal para Grafos Dispersos:</strong> Cuando el número de aristas es mucho menor que V²</li>
+                <li><strong>Fácil Iteración:</strong> Es eficiente para iterar sobre los vecinos de un vértice</li>
+            </ul>
+
+            <h4>Desventajas:</h4>
+            <ul>
+                <li><strong>Consulta de Aristas:</strong> O(V) para verificar si existe una arista entre dos vértices</li>
+            </ul>
+
+            <div class="code-block">
+<strong>Ejemplo de Lista de Adyacencia:</strong>
+
+Grafo:
+  A -> [B, C]
+  B -> [A, D]
+  C -> [A, E]
+  D -> [B, E]
+  E -> [C, D]
+
+Representación en Python:
+{
+    'A': ['B', 'C'],
+    'B': ['A', 'D'],
+    'C': ['A', 'E'],
+    'D': ['B', 'E'],
+    'E': ['C', 'D']
+}
+            </div>
+
+            <h3>2. Matriz de Adyacencia</h3>
+            <p>
+                La matriz de adyacencia es una representación que utiliza una matriz cuadrada de tamaño V × V, 
+                donde V es el número de vértices. El elemento [i][j] es 1 (o el peso) si existe una arista 
+                entre el vértice i y j, y 0 en caso contrario.
+            </p>
+
+            <h4>Ventajas:</h4>
+            <ul>
+                <li><strong>Consulta Rápida de Aristas:</strong> O(1) para verificar si existe una arista</li>
+                <li><strong>Ideal para Grafos Densos:</strong> Cuando el número de aristas está cerca de V²</li>
+                <li><strong>Operaciones Matriciales:</strong> Permite usar operaciones de álgebra lineal</li>
+            </ul>
+
+            <h4>Desventajas:</h4>
+            <ul>
+                <li><strong>Eficiencia de Espacio:</strong> O(V²), puede ser muy grande para grafos grandes</li>
+                <li><strong>Ineficiente para Grafos Dispersos:</strong> Desperdicia espacio en ceros</li>
+            </ul>
+
+            <div class="code-block">
+<strong>Ejemplo de Matriz de Adyacencia:</strong>
+
+      A  B  C  D  E
+  A [ 0  1  1  0  0 ]
+  B [ 1  0  0  1  0 ]
+  C [ 1  0  0  0  1 ]
+  D [ 0  1  0  0  1 ]
+  E [ 0  0  1  1  0 ]
+
+Representación en Python:
+[
+    [0, 1, 1, 0, 0],
+    [1, 0, 0, 1, 0],
+    [1, 0, 0, 0, 1],
+    [0, 1, 0, 0, 1],
+    [0, 0, 1, 1, 0]
+]
+            </div>
+
+            <h3>Comparación Visual</h3>
+            <div class="diagram">
+                <p><strong>Mismo Grafo en Ambas Representaciones</strong></p>
+                <svg viewBox="0 0 500 300" width="500" height="300">
+                    <!-- Grafo Visual -->
+                    <line x1="100" y1="80" x2="150" y2="80" stroke="#667eea" stroke-width="2"/>
+                    <line x1="100" y1="80" x2="100" y2="150" stroke="#667eea" stroke-width="2"/>
+                    <line x1="150" y1="80" x2="200" y2="150" stroke="#667eea" stroke-width="2"/>
+
+                    <circle cx="100" cy="80" r="20" fill="#667eea"/>
+                    <circle cx="150" cy="80" r="20" fill="#667eea"/>
+                    <circle cx="100" cy="150" r="20" fill="#764ba2"/>
+                    <circle cx="200" cy="150" r="20" fill="#764ba2"/>
+
+                    <text x="100" y="85" text-anchor="middle" fill="white" font-weight="bold">A</text>
+                    <text x="150" y="85" text-anchor="middle" fill="white" font-weight="bold">B</text>
+                    <text x="100" y="155" text-anchor="middle" fill="white" font-weight="bold">C</text>
+                    <text x="200" y="155" text-anchor="middle" fill="white" font-weight="bold">D</text>
+                </svg>
+            </div>
+
+            <h3>Tabla Comparativa</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspecto</th>
+                            <th>Lista de Adyacencia</th>
+                            <th>Matriz de Adyacencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Espacio</strong></td>
+                            <td>O(V + E)</td>
+                            <td>O(V²)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Consultar Arista</strong></td>
+                            <td>O(V)</td>
+                            <td>O(1)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Iterar Vecinos</strong></td>
+                            <td>O(grado)</td>
+                            <td>O(V)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mejor para</strong></td>
+                            <td>Grafos dispersos</td>
+                            <td>Grafos densos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agregar Arista</strong></td>
+                            <td>O(1)</td>
+                            <td>O(1)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Eliminar Arista</strong></td>
+                            <td>O(grado)</td>
+                            <td>O(1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Ejemplo Práctico: Mismo Grafo</h3>
+            <div class="comparison">
+                <div class="comparison-item">
+                    <h4>Lista de Adyacencia</h4>
+                    <div class="code-block">
+A: [B, C]
+B: [A, D]
+C: [A]
+D: [B, C]
+
+Espacio: O(8)
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>Matriz de Adyacencia</h4>
+                    <div class="code-block">
+    A B C D
+A [ 0 1 1 0 ]
+B [ 1 0 0 1 ]
+C [ 1 0 0 1 ]
+D [ 0 1 1 0 ]
+
+Espacio: O(16)
+                    </div>
+                </div>
+            </div>
+
+            <h3>¿Cuál Elegir?</h3>
+            <div class="highlight">
+                <ul>
+                    <li><strong>Usa Lista de Adyacencia si:</strong>
+                        <ul>
+                            <li>El grafo es disperso (pocas aristas)</li>
+                            <li>Necesitas iterar sobre los vecinos frecuentemente</li>
+                            <li>La memoria es crítica</li>
+                        </ul>
+                    </li>
+                    <li><strong>Usa Matriz de Adyacencia si:</strong>
+                        <ul>
+                            <li>El grafo es denso (muchas aristas)</li>
+                            <li>Necesitas verificar rapidez si existe una arista entre dos nodos</li>
+                            <li>Necesitas operaciones matriciales</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </article>
+
+        <!-- POST 3: Algoritmos de Recorrido -->
+        <article class="post" id="post3">
+            <h2>📌 Post #3: Algoritmos Fundamentales de Recorrido</h2>
+            <div class="post-meta">
+                Publicado: 21 de Noviembre, 2025 | Lectura: 12 min
+            </div>
+
+            <h3>Introducción</h3>
+            <p>
+                Los algoritmos de recorrido son fundamentales en la teoría de grafos. Permiten visitar todos los 
+                vértices de un grafo de manera sistemática. Los dos algoritmos más importantes son:
+                <strong>Búsqueda en Amplitud (BFS)</strong> y <strong>Búsqueda en Profundidad (DFS)</strong>.
+            </p>
+
+            <h3>1. Búsqueda en Amplitud (BFS - Breadth-First Search)</h3>
+
+            <h4>Definición</h4>
+            <p>
+                <strong>BFS</strong> es un algoritmo de recorrido que explora un grafo nivel por nivel. 
+                Comienza desde un nodo inicial y visita todos sus vecinos antes de pasar a los vecinos de esos vecinos.
+            </p>
+
+            <h4>Características:</h4>
+            <ul>
+                <li><strong>Estructura de Datos:</strong> Utiliza una <strong>Cola (Queue)</strong></li>
+                <li><strong>Orden de Exploración:</strong> Nivel por nivel (por capas)</li>
+                <li><strong>Complejidad Temporal:</strong> O(V + E), donde V es vértices y E es aristas</li>
+                <li><strong>Complejidad Espacial:</strong> O(V)</li>
+            </ul>
+
+            <h4>Algoritmo BFS (Pseudocódigo):</h4>
+            <div class="code-block">
+BFS(grafo, inicio):
+    crear cola vacía
+    crear conjunto visitados vacío
+    
+    encolar(inicio)
+    marcar inicio como visitado
+    
+    mientras cola no esté vacía:
+        nodo_actual = desencolar()
+        procesar nodo_actual
+        
+        para cada vecino de nodo_actual:
+            si vecino no está visitado:
+                encolar(vecino)
+                marcar vecino como visitado
+            </div>
+
+            <h4>Ejemplo de BFS:</h4>
+            <div class="diagram">
+                <p><strong>Ejecución de BFS desde A</strong></p>
+                <svg viewBox="0 0 600 400" width="600" height="400">
+                    <!-- Aristas -->
+                    <line x1="150" y1="100" x2="300" y2="100" stroke="#ddd" stroke-width="2"/>
+                    <line x1="300" y1="100" x2="450" y2="100" stroke="#ddd" stroke-width="2"/>
+                    <line x1="150" y1="100" x2="150" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="300" y1="100" x2="300" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="450" y1="100" x2="450" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="150" y1="300" x2="300" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="300" y1="300" x2="450" y2="300" stroke="#ddd" stroke-width="2"/>
+
+                    <!-- Vértices con colores según nivel -->
+                    <circle cx="150" cy="100" r="30" fill="#667eea"/>
+                    <circle cx="300" cy="100" r="30" fill="#ffc107"/>
+                    <circle cx="450" cy="100" r="30" fill="#ffc107"/>
+                    <circle cx="150" cy="300" r="30" fill="#28a745"/>
+                    <circle cx="300" cy="300" r="30" fill="#28a745"/>
+                    <circle cx="450" cy="300" r="30" fill="#28a745"/>
+
+                    <!-- Etiquetas -->
+                    <text x="150" y="110" text-anchor="middle" fill="white" font-weight="bold" font-size="18">A</text>
+                    <text x="300" y="110" text-anchor="middle" fill="white" font-weight="bold" font-size="18">B</text>
+                    <text x="450" y="110" text-anchor="middle" fill="white" font-weight="bold" font-size="18">C</text>
+                    <text x="150" y="310" text-anchor="middle" fill="white" font-weight="bold" font-size="18">D</text>
+                    <text x="300" y="310" text-anchor="middle" fill="white" font-weight="bold" font-size="18">E</text>
+                    <text x="450" y="310" text-anchor="middle" fill="white" font-weight="bold" font-size="18">F</text>
+
+                    <!-- Leyenda -->
+                    <rect x="20" y="20" width="20" height="20" fill="#667eea"/>
+                    <text x="50" y="35" font-size="12">Inicio</text>
+
+                    <rect x="120" y="20" width="20" height="20" fill="#ffc107"/>
+                    <text x="150" y="35" font-size="12">Nivel 1</text>
+
+                    <rect x="220" y="20" width="20" height="20" fill="#28a745"/>
+                    <text x="250" y="35" font-size="12">Nivel 2</text>
+                </svg>
+            </div>
+
+            <div class="code-block">
+<strong>Orden de Visita (BFS desde A):</strong>
+1. Visita A (inicio)
+2. Visita B, C, D (vecinos de A)
+3. Visita E, F (vecinos de B, C, D)
+
+Orden: A → B → C → D → E → F
+            </div>
+
+            <h4>Aplicaciones de BFS:</h4>
+            <ul>
+                <li><strong>Camino Más Corto:</strong> Encontrar la ruta más corta en grafos no ponderados</li>
+                <li><strong>Verificar Conectividad:</strong> Determinar si un grafo está conectado</li>
+                <li><strong>Búsqueda de Nivel:</strong> Encontrar todos los nodos a una distancia específica</li>
+                <li><strong>Red Social:</strong> Encontrar amigos de amigos en N grados</li>
+            </ul>
+
+            <h3>2. Búsqueda en Profundidad (DFS - Depth-First Search)</h3>
+
+            <h4>Definición</h4>
+            <p>
+                <strong>DFS</strong> es un algoritmo de recorrido que explora un grafo explorando tan profundamente 
+                como sea posible antes de retroceder. Comienza desde un nodo inicial y sigue un camino hasta el final 
+                antes de explorar otros caminos.
+            </p>
+
+            <h4>Características:</h4>
+            <ul>
+                <li><strong>Estructura de Datos:</strong> Utiliza una <strong>Pila (Stack)</strong> o recursión</li>
+                <li><strong>Orden de Exploración:</strong> Profundidad primero (hasta el fondo)</li>
+                <li><strong>Complejidad Temporal:</strong> O(V + E)</li>
+                <li><strong>Complejidad Espacial:</strong> O(V)</li>
+            </ul>
+
+            <h4>Algoritmo DFS (Pseudocódigo - Versión Recursiva):</h4>
+            <div class="code-block">
+DFS(grafo, nodo, visitados):
+    marcar nodo como visitado
+    procesar nodo
+    
+    para cada vecino de nodo:
+        si vecino no está visitado:
+            DFS(grafo, vecino, visitados)
+
+DFS_Inicio(grafo, inicio):
+    visitados = conjunto vacío
+    DFS(grafo, inicio, visitados)
+            </div>
+
+            <h4>Algoritmo DFS (Pseudocódigo - Versión Iterativa):</h4>
+            <div class="code-block">
+DFS_Iterativo(grafo, inicio):
+    crear pila vacía
+    crear conjunto visitados vacío
+    
+    apilar(inicio)
+    
+    mientras pila no esté vacía:
+        nodo_actual = desapilar()
+        
+        si nodo_actual no está visitado:
+            marcar nodo_actual como visitado
+            procesar nodo_actual
+            
+            para cada vecino de nodo_actual:
+                si vecino no está visitado:
+                    apilar(vecino)
+            </div>
+
+            <h4>Ejemplo de DFS:</h4>
+            <div class="diagram">
+                <p><strong>Ejecución de DFS desde A (explorando profundidad)</strong></p>
+                <svg viewBox="0 0 600 400" width="600" height="400">
+                    <!-- Aristas -->
+                    <line x1="150" y1="100" x2="300" y2="100" stroke="#ddd" stroke-width="2"/>
+                    <line x1="300" y1="100" x2="450" y2="100" stroke="#ddd" stroke-width="2"/>
+                    <line x1="150" y1="100" x2="150" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="300" y1="100" x2="300" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="450" y1="100" x2="450" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="150" y1="300" x2="300" y2="300" stroke="#ddd" stroke-width="2"/>
+                    <line x1="300" y1="300" x2="450" y2="300" stroke="#ddd" stroke-width="2"/>
+
+                    <!-- Vértices con colores según orden -->
+                    <circle cx="150" cy="100" r="30" fill="#667eea"/>
+                    <circle cx="300" cy="100" r="30" fill="#00ff00"/>
+                    <circle cx="450" cy="100" r="30" fill="#90EE90"/>
+                    <circle cx="150" cy="300" r="30" fill="#00cc00"/>
+                    <circle cx="300" cy="300" r="30" fill="#90EE90"/>
+                    <circle cx="450" cy="300" r="30" fill="#90EE90"/>
+
+                    <!-- Etiquetas con números de orden -->
+                    <text x="150" y="110" text-anchor="middle" fill="white" font-weight="bold" font-size="18">A(1)</text>
+                    <text x="300" y="110" text-anchor="middle" fill="white" font-weight="bold" font-size="18">B(2)</text>
+                    <text x="450" y="110" text-anchor="middle" fill="white" font-weight="bold" font-size="18">C(3)</text>
+                    <text x="150" y="310" text-anchor="middle" fill="white" font-weight="bold" font-size="18">D(4)</text>
+                    <text x="300" y="310" text-anchor="middle" fill="white" font-weight="bold" font-size="18">E(5)</text>
+                    <text x="450" y="310" text-anchor="middle" fill="white" font-weight="bold" font-size="18">F(6)</text>
+
+                    <!-- Leyenda -->
+                    <rect x="20" y="20" width="20" height="20" fill="#667eea"/>
+                    <text x="50" y="35" font-size="12">Inicio</text>
+
+                    <rect x="120" y="20" width="20" height="20" fill="#00cc00"/>
+                    <text x="150" y="35" font-size="12">Visitado</text>
+
+                    <rect x="220" y="20" width="20" height="20" fill="#90EE90"/>
+                    <text x="250" y="35" font-size="12">Por visitar</text>
+                </svg>
+            </div>
+
+            <div class="code-block">
+<strong>Orden de Visita (DFS desde A):</strong>
+1. Visita A
+2. Va a B (primer vecino de A)
+3. Va a D (primer vecino de B no visitado)
+4. Va a E (primer vecino de D no visitado)
+5. Va a C (primer vecino de E no visitado)
+6. Va a F (primer vecino de C no visitado)
+
+Orden: A → B → D → E → C → F
+            </div>
+
+            <h4>Aplicaciones de DFS:</h4>
+            <ul>
+                <li><strong>Detección de Ciclos:</strong> Determinar si un grafo tiene ciclos</li>
+                <li><strong>Ordenamiento Topológico:</strong> Ordenar vértices en grafos dirigidos acíclicos</li>
+                <li><strong>Componentes Fuertemente Conectados:</strong> Encontrar SCC en grafos dirigidos</li>
+                <li><strong>Resolver Laberintos:</strong> Encontrar caminos en estructuras de árbol</li>
+                <li><strong>Análisis de Conectividad:</strong> Determinar componentes conexos</li>
+            </ul>
+
+            <h3>Comparación BFS vs DFS</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspecto</th>
+                            <th>BFS</th>
+                            <th>DFS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Estructura</strong></td>
+                            <td>Cola</td>
+                            <td>Pila / Recursión</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Orden</strong></td>
+                            <td>Nivel por nivel</td>
+                            <td>Profundidad primero</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tiempo</strong></td>
+                            <td>O(V + E)</td>
+                            <td>O(V + E)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Espacio</strong></td>
+                            <td>O(V)</td>
+                            <td>O(V)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Camino Más Corto</strong></td>
+                            <td>✓ (No ponderado)</td>
+                            <td>✗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Detección de Ciclos</strong></td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memoria</strong></td>
+                            <td>Potencialmente más</td>
+                            <td>Usualmente menos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mejor Para</strong></td>
+                            <td>Distancia uniforme</td>
+                            <td>Exploración profunda</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Resumen</h3>
+            <div class="highlight">
+                <p><strong>BFS (Breadth-First Search):</strong></p>
+                <ul>
+                    <li>Explora nivel por nivel usando una cola</li>
+                    <li>Ideal para encontrar el camino más corto</li>
+                    <li>Orden: A → B → C → D → E → F</li>
+                </ul>
+
+                <p style="margin-top: 15px;"><strong>DFS (Depth-First Search):</strong></p>
+                <ul>
+                    <li>Explora profundamente usando una pila o recursión</li>
+                    <li>Ideal para detección de ciclos y ordenamiento topológico</li>
+                    <li>Orden: A → B → D → E → C → F (dependiendo del orden de vecinos)</li>
+                </ul>
+            </div>
+        </article>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2025 Blog Educativo de Grafos. Creado como parte del curso de Estructuras de Datos 2.</p>
+            <p>Última actualización: 21 de Noviembre, 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        function mostrarPost(numeroPost) {
+            // Ocultar todos los posts
+            const posts = document.querySelectorAll('.post');
+            posts.forEach(post => post.classList.remove('active'));
+
+            // Remover clase active de todos los botones
+            const botones = document.querySelectorAll('.nav-btn');
+            botones.forEach(btn => btn.classList.remove('active'));
+
+            // Mostrar el post seleccionado
+            document.getElementById('post' + numeroPost).classList.add('active');
+
+            // Marcar botón como activo
+            event.target.classList.add('active');
+
+            // Scroll suave hacia arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
