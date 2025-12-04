@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Técnico - Grafos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">Grafos & Estructuras por jesus muriel</div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Inicio</a></li>
+                <li><a href="#posts" class="nav-link">Artículos</a></li>
+                <li><a href="#about" class="nav-link">Acerca de</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Explorando la Estructura de Datos Grafos</h1>
+            <p>Un blog técnico dedicado a comprender y dominar los grafos en programación</p>
+            <button class="cta-button" onclick="document.getElementById('posts').scrollIntoView({behavior: 'smooth'})">
+                Leer Artículos
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        <section id="posts" class="posts-section">
+            <h2>Artículos Recientes</h2>
+            <div class="posts-grid">
+                <!-- Post 1 -->
+                <article class="post-card" onclick="showPost('post1')">
+                    <div class="post-header">
+                        <h3>Introducción a los Grafos</h3>
+                        <span class="post-date">25 de Noviembre, 2025</span>
+                    </div>
+                    <p>Descubre qué son los grafos, sus componentes fundamentales y los diferentes tipos que existen.</p>
+                    <span class="read-more">Leer más →</span>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="post-card" onclick="showPost('post2')">
+                    <div class="post-header">
+                        <h3>Representación de Grafos</h3>
+                        <span class="post-date">25 de Noviembre, 2025</span>
+                    </div>
+                    <p>Explora las dos formas principales de representar grafos en memoria: listas y matrices de adyacencia.</p>
+                    <span class="read-more">Leer más →</span>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="post-card" onclick="showPost('post3')">
+                    <div class="post-header">
+                        <h3>Algoritmos Fundamentales de Recorrido</h3>
+                        <span class="post-date">25 de Noviembre, 2025</span>
+                    </div>
+                    <p>Aprende los dos algoritmos esenciales para recorrer grafos: BFS y DFS.</p>
+                    <span class="read-more">Leer más →</span>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para posts completos -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePost()">&times;</span>
+            <div id="postContent"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Blog Técnico de Grafos. Creado por Jesus Edwin Muriel Arias.</p>
+            <p>Desarrollado con HTML, CSS y JavaScript para la materia de estructuras de datos 2</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
